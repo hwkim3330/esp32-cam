@@ -1,4 +1,118 @@
-# 📷 ESP32-CAM FPV Bot (with Motor Control & MJPEG Streaming)
+# 🚗 ESP32-CAM WiFi FPV Robot Car with Live MJPEG Streaming + Web Control
+
+📷 실시간 카메라 스트리밍과 Web 버튼으로 제어하는 2WD 로봇카 프로젝트입니다.  
+ESP32-CAM 보드를 기반으로 **SoftAP + MJPEG 스트리밍 + WebSocket 모터 제어 + 플래시 버튼**을 구현합니다.
+
+---
+
+## 📸 기능 개요
+
+- ✅ 실시간 MJPEG 스트리밍 (`/stream`)
+- ✅ SoftAP Wi-Fi 자동 생성 (ESP-CAM 접속)
+- ✅ WebSocket 기반 방향 제어 버튼 (앞, 뒤, 좌, 우, 정지)
+- ✅ 플래시 On/Off 제어 버튼 추가 🔦
+- ✅ 안정성 향상을 위한 프레임 지연/처리 최적화
+- ✅ 초경량 해상도 (QQVGA) 사용으로 프레임 속도 확보
+- ✅ 1초 단위 JPEG 캡처로 안정성 극대화
+
+---
+
+## 🛠️ 사용 부품
+
+| 부품 | 설명 |
+|------|------|
+| ESP32-CAM (AI Thinker) | WiFi + OV2640 카메라 모듈 포함 |
+| 2채널 L298N 또는 드라이버 모듈 | 모터 드라이버 |
+| 2WD DC 모터 + 바퀴 | 로봇 구동 |
+| 전원 5V (USB 또는 배터리) | ESP32 + 모터 전원 |
+| 기타 | 점퍼선, 브레드보드 등 |
+
+---
+
+## ⚙️ 핀맵 정리 (📌 camera_pins.h 기준)
+
+### 📷 카메라 핀맵 (AI Thinker 모델)
+| 핀 이름 | 번호 |
+|---------|------|
+| PWDN    | 32   |
+| RESET   | -1   |
+| XCLK    | 0    |
+| SIOD    | 26   |
+| SIOC    | 27   |
+| Y9~Y2   | 35, 34, 39, 36, 21, 19, 18, 5 |
+| VSYNC   | 25   |
+| HREF    | 23   |
+| PCLK    | 22   |
+
+### ⚙️ DC 모터 제어 핀
+
+| 역할 | 핀 번호 |
+|------|---------|
+| 왼쪽 모터 IN1 | GPIO 12 |
+| 왼쪽 모터 IN2 | GPIO 13 |
+| 오른쪽 모터 IN1 | GPIO 14 |
+| 오른쪽 모터 IN2 | GPIO 15 |
+
+### 🔦 플래시 LED 핀
+
+| 역할 | 핀 번호 |
+|------|---------|
+| 플래시 LED 제어 | GPIO 4 |
+
+---
+
+## 🌐 Wi-Fi 접속
+
+1. ESP32-CAM을 업로드 후 전원 연결
+2. 스마트폰/노트북에서 Wi-Fi `ESP_CAM` 접속 (비번: `12345678`)
+3. 브라우저 열고 `http://192.168.4.1` 접속
+
+---
+
+## 🖥️ 웹 UI
+
+- 🖱️ 버튼 클릭 시 WebSocket으로 제어 명령 전송
+- 📷 `/stream` 경로로 MJPEG 영상 송출
+- 🔦 플래시 LED On/Off 가능
+
+---
+
+## 🚀 업로드 방법
+
+1. 아두이노 IDE 설정:
+   - 보드: `ESP32 Wrover Module`
+   - Partition Scheme: `Huge APP`
+   - PSRAM: `Enabled`
+2. 포트 선택 후 업로드 (IO0을 GND에 연결 → Flash mode)
+
+---
+
+## 🛡️ 문제 해결
+
+- **플래시 LED 안 켜짐** → GPIO 4 연결 확인, 외부 전원 부족 여부 점검
+- **리셋 반복 발생** → PSRAM 사용 불가 보드일 경우 `config.psram = false`
+- **스트리밍 느림** → `jpeg_quality = 10~30` 등 적절한 조정
+
+---
+
+## 📂 파일 구조
+
+```
+
+esp32-cam/
+├── bot.c              # 전체 제어 코드 (카메라 + 제어)
+├── camera\_pins.h      # AI Thinker 핀 정의
+└── README.md
+
+```
+
+---
+
+## 📜 라이선스
+
+MIT License
+
+
 <img width="1795" height="1005" alt="image" src="https://github.com/user-attachments/assets/5b1e4a8e-a080-4bbf-95e2-bee034e380a1" />
 
 > ESP32-CAM을 활용한 실시간 카메라 스트리밍 + WebSocket 기반 로봇 제어 프로젝트  
