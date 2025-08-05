@@ -1,4 +1,5 @@
 # 📷 ESP32-CAM FPV Bot (with Motor Control & MJPEG Streaming)
+<img width="1795" height="1005" alt="image" src="https://github.com/user-attachments/assets/5b1e4a8e-a080-4bbf-95e2-bee034e380a1" />
 
 > ESP32-CAM을 활용한 실시간 카메라 스트리밍 + WebSocket 기반 로봇 제어 프로젝트  
 > WiFi SoftAP 기반으로 별도 공유기 없이 휴대폰으로 접속하여 영상 확인 및 방향 제어 가능!
