@@ -41,7 +41,7 @@ static esp_err_t stream_handler(httpd_req_t *req) {
     esp_camera_fb_return(fb);
 
     if (res != ESP_OK) break;
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
   }
   return res;
 }
@@ -172,12 +172,12 @@ void startCamera() {
   config.pixel_format = PIXFORMAT_JPEG;
 
   if(psramFound()){
-    config.frame_size = FRAMESIZE_96X96;
-    config.jpeg_quality = 63;
+    config.frame_size = FRAMESIZE_QQVGA;
+    config.jpeg_quality = 0;
     config.fb_count = 2;
   } else {
     config.frame_size = FRAMESIZE_QQVGA;
-    config.jpeg_quality = 30;
+    config.jpeg_quality = 0;
     config.fb_count = 1;
   }
 
