@@ -7,6 +7,13 @@
 #define CAMERA_MODEL_AI_THINKER
 #include "camera_pins.h"
 
+// 모터 제어 핀 설정 (왼쪽 모터 L1/L2, 오른쪽 모터 R1/R2)
+#define MOTOR_L1_PIN 12
+#define MOTOR_L2_PIN 13
+#define MOTOR_R1_PIN 14
+#define MOTOR_R2_PIN 15
+
+
 // WiFi AP 정보
 const char* ssid = "ESP_CAM";
 const char* password = "12345678";
@@ -34,7 +41,7 @@ static esp_err_t stream_handler(httpd_req_t *req) {
     esp_camera_fb_return(fb);
 
     if (res != ESP_OK) break;
-    vTaskDelay(30 / portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
   }
   return res;
 }
@@ -110,15 +117,35 @@ void handleWebSocket(uint8_t num, WStype_t type, uint8_t * payload, size_t lengt
     String msg = String((char*)payload);
     Serial.print("[WebSocket] Received: "); Serial.println(msg);
 
-    // 예시 명령 처리
     if (msg == "forward") {
-      Serial.println("Move Forward");
-      // 예: 모터 핀 HIGH 설정 등
+      digitalWrite(MOTOR_L1_PIN, HIGH);
+      digitalWrite(MOTOR_L2_PIN, LOW);
+      digitalWrite(MOTOR_R1_PIN, HIGH);
+      digitalWrite(MOTOR_R2_PIN, LOW);
+    } else if (msg == "back") {
+      digitalWrite(MOTOR_L1_PIN, LOW);
+      digitalWrite(MOTOR_L2_PIN, HIGH);
+      digitalWrite(MOTOR_R1_PIN, LOW);
+      digitalWrite(MOTOR_R2_PIN, HIGH);
     } else if (msg == "left") {
-      Serial.println("Turn Left");
+      digitalWrite(MOTOR_L1_PIN, LOW);
+      digitalWrite(MOTOR_L2_PIN, HIGH);
+      digitalWrite(MOTOR_R1_PIN, HIGH);
+      digitalWrite(MOTOR_R2_PIN, LOW);
+    } else if (msg == "right") {
+      digitalWrite(MOTOR_L1_PIN, HIGH);
+      digitalWrite(MOTOR_L2_PIN, LOW);
+      digitalWrite(MOTOR_R1_PIN, LOW);
+      digitalWrite(MOTOR_R2_PIN, HIGH);
+    } else if (msg == "stop") {
+      digitalWrite(MOTOR_L1_PIN, LOW);
+      digitalWrite(MOTOR_L2_PIN, LOW);
+      digitalWrite(MOTOR_R1_PIN, LOW);
+      digitalWrite(MOTOR_R2_PIN, LOW);
     }
   }
 }
+
 
 // 카메라 초기화
 void startCamera() {
@@ -145,12 +172,12 @@ void startCamera() {
   config.pixel_format = PIXFORMAT_JPEG;
 
   if(psramFound()){
-    config.frame_size = FRAMESIZE_QVGA;
-    config.jpeg_quality = 25;
+    config.frame_size = FRAMESIZE_96X96;
+    config.jpeg_quality = 63;
     config.fb_count = 2;
   } else {
-    config.frame_size = FRAMESIZE_CIF;
-    config.jpeg_quality = 15;
+    config.frame_size = FRAMESIZE_QQVGA;
+    config.jpeg_quality = 30;
     config.fb_count = 1;
   }
 
@@ -166,6 +193,18 @@ void setup() {
   WiFi.softAP(ssid, password);
   Serial.print("SoftAP IP: "); Serial.println(WiFi.softAPIP());
 
+  // 모터 핀 초기화
+  pinMode(MOTOR_L1_PIN, OUTPUT);
+  pinMode(MOTOR_L2_PIN, OUTPUT);
+  pinMode(MOTOR_R1_PIN, OUTPUT);
+  pinMode(MOTOR_R2_PIN, OUTPUT);
+
+  // 모터 정지 상태로 시작
+  digitalWrite(MOTOR_L1_PIN, LOW);
+  digitalWrite(MOTOR_L2_PIN, LOW);
+  digitalWrite(MOTOR_R1_PIN, LOW);
+  digitalWrite(MOTOR_R2_PIN, LOW);
+
   startCamera();
   startWebServer();
 
@@ -173,6 +212,7 @@ void setup() {
   webSocket.onEvent(handleWebSocket);
   Serial.println("WebSocket started on port 81");
 }
+
 
 void loop() {
   webSocket.loop();
